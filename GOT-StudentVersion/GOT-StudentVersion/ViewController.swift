@@ -15,16 +15,15 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        cretateEpisodes()
+        loadData()
         tableView.delegate = self
         tableView.dataSource = self
     }
-
-    func cretateEpisodes() {
-        for (index, _) in GOTEpisode.allEpisodes.enumerated() {
-            gotEpisodes.append(GOTEpisode.allEpisodes[index])
-        }
+    
+    func loadData() {
+        self.gotEpisodes = GOTEpisode.allEpisodes
     }
+    
 }
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
@@ -34,19 +33,41 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let episode = gotEpisodes[indexPath.row]
+        var cell: GOTTableViewCell
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "EpisodeCell") as! GOTTableViewCell
-        cell.setEpisode(episode: episode)
+        if episode.season % 2 != 0 {
+            cell = tableView.dequeueReusableCell(withIdentifier: "EpisodeCell") as! GOTTableViewCell
+            cell.setEpisode(episode: episode)
+
+        } else {
+            cell = tableView.dequeueReusableCell(withIdentifier: "EpisodeCell2") as! GOTTableViewCell
+            cell.setEpisode(episode: episode)
+        }
+        
         
         return cell
     }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return CGFloat(100)
+        return CGFloat(130)
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // Get the new view controller using segue.destination
+        switch segue.identifier! {
+        case "GOTDetailSegue1":
+            if let destination = segue.destination as? GOTDetailViewController {
+                destination.episode = gotEpisodes[tableView.indexPathForSelectedRow!.row]
+            }
+        case "GOTDetailSegue2":
+            if let destination = segue.destination as? GOTDetailViewController {
+                destination.episode = gotEpisodes[tableView.indexPathForSelectedRow!.row]
+            }
+        default:
+            fatalError()
+        }
+        // Pass the selected object to the new view controller.
+    }
+    
 }
 
-
-//    override func didReceiveMemoryWarning() {
-//        super.didReceiveMemoryWarning()
-//        // Dispose of any resources that can be recreated.
-//    }
